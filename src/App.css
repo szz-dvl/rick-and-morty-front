@@ -2,6 +2,20 @@
   text-align: center;
 }
 
+.App::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; 
+  height: 100%;
+  background-image: url(./images/rick-morty.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(0.65) opacity(0.85);
+  z-index: -20;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -36,4 +50,12 @@
   100% {
     transform: translateY(0px);
   }
+}
+
+.visible {
+  visibility: visible;
+}
+
+.invisible {
+  visibility: hidden;
 }
