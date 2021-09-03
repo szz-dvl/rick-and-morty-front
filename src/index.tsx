@@ -6,7 +6,9 @@ import { store } from './app/store';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import SessionService from "./session/SessionService";
+import dotenv from "dotenv";
 
+dotenv.config();
 SessionService.init(store);
 
 ReactDOM.render(

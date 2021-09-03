@@ -50,6 +50,7 @@ function Login() {
             </form>
 
             <p className={`login-error ${error ? "visible" : "invisible"}`}> {error} </p>
+            
         </div>
     );
 }

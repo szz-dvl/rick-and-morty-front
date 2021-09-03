@@ -26,10 +26,10 @@ const PrivateRoute = ({ component: Component, exact = false, path, authenticated
   />
 );
 
-const { object, bool, string } = PropTypes;
+const { object, bool, string, func } = PropTypes;
 
 PrivateRoute.propTypes = {
-  component: object.isRequired,
+  component: func.isRequired,
   exact: bool,
   path: string.isRequired,
   authenticated: bool.isRequired,

@@ -1,6 +1,9 @@
-export function fakeSubmit(user: string, pwd: string) {
-    return new Promise<{ token: string }>((resolve, reject) =>
-      setTimeout(() => user && pwd ? resolve({ token: "fsdfsdfdsfdsf" }) : reject("Missing Data"), 1200)
-    );
-  }
+import { postData } from "../../common";
+
+export const submitLogin = async (user: string, pwd: string) => {
+    
+  const response = await postData('/auth/login', { user, pwd, remember: false });
+  return response.token;
+
+}
   

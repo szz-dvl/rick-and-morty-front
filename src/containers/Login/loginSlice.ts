@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fakeSubmit } from './loginAPI';
+import { submitLogin } from './loginAPI';
 import SessionService from '../../session/SessionService';
 
 export interface LoginState {
@@ -22,7 +22,7 @@ export const submit = createAsyncThunk(
     async ({ nick, pwd }: LoginData, thunkAPI) => {
         try {
 
-            const { token } = await fakeSubmit(nick, pwd);
+            const { token } = await submitLogin(nick, pwd);
             SessionService.saveData(nick, token);
 
             return true;
@@ -48,8 +48,10 @@ export const loginSlice = createSlice({
                 state.in_progress = false;
             })
             .addCase(submit.rejected, (state, action) => {
+                let error = action.payload as Error;
+
                 state.in_progress = false;
-                state.error = action.payload as string;
+                state.error = error.message;
             });
     },
 });
