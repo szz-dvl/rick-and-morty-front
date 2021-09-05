@@ -1,20 +1,140 @@
 .character-card {
     display: flex;
+    flex-direction: column;
     border: 1px solid black;
+    border-radius: 5px;
+    position: relative;
+}
+
+.character-card--data, .character-card--links {
+    display: flex;
+}
+
+.character-card--data {
+    justify-content: space-around;
+}
+
+.character-card--links {
+    margin-top: 5px;
+    justify-content: space-between;
+    align-content: center;
 }
 
 .character-card--image {
     width: 40%;
-    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 15px 10px;
+}
+
+.character-card--image.tiny {
+    width: 100%;
+    padding: 15px 0;
+}
+
+.character-card--data.tiny {
+    flex-direction: column;
+}
+
+.character-card--data.tiny span {
+    width: auto;
+    align-self: center;
 }
 
 .character-card--image img {
-    position: absolute;
-    top: 0;
-    left: 0;
+    border-radius: 5px;
+    margin: auto;
 }
 
 .character-card--info {
+    /* padding: 15px 10px; */
+    padding-left: 5px;
     width: 60%;
-    text-align: center;
+    max-width: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.character-card--labeled label {
+    font-weight: bold;
+    padding-right: 5px;
+}
+
+.character-card--labeled.small {
+    display: flex;
+    flex-direction: column;
+}
+
+.character-card--name {
+    font-size: x-large;
+    width: 90%;
+    padding-left: 15px;
+    align-self: center;
+
+}
+.character-card--fav {
+    width: 10%;
+    cursor: pointer;   
+}
+
+.character-card--fav.small {
+    padding-right: 15px;
+}
+
+.character-card--fav svg {
+    filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+    max-width: 50px;
+}
+.character-card--fav.fav {
+    fill: yellow
+}
+
+.character-card--fav.no-fav {
+    fill: lightgray
+}
+
+.character-card--name a{
+    color: unset;
+    text-decoration: none;
+}
+
+.character-card--status {
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+    margin: 0;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.character-card--status li {
+    display: flex;
+}
+
+.character-card--status li span {
+    height: min-content;
+    align-self: center;
+    margin-right: 5px;
+}
+
+.character-card--status li svg {
+    width: 33px;
+}
+
+.status--alive {
+    fill: green;
+    transform: scale(0.85);
+}
+
+.status--dead {
+    fill: red;
+}
+
+.status--unknown {
+    transform: scale(0.85);
+}
+
+.gender--genderless {
+    transform: scale(0.65);
 }

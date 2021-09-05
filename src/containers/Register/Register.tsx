@@ -12,6 +12,7 @@ export default function Register() {
     const [nick, setNickName] = useState("");
     const [pwd, setPwd] = useState("");
     const [check, setPwdCheck] = useState("");
+    const [errorTo, setErrorTo] = useState<NodeJS.Timeout | null>(null);
 
     const error = useAppSelector((state: RootState) => state.register.error);
     const in_progress = useAppSelector((state: RootState) => state.register.in_progress);
@@ -27,11 +28,17 @@ export default function Register() {
     }
 
     useEffect(() => {
-        
+
         if (error) {
-            setTimeout(() => {
-                dispatch(clean());
-            }, parseInt(process.env.REACT_APP_ERR_TO as string));
+
+            if (errorTo)
+                clearTimeout(errorTo);
+
+            setErrorTo(
+                setTimeout(() => {
+                    dispatch(clean());
+                }, parseInt(process.env.REACT_APP_ERR_TO as string))
+            );
         }
 
     }, [error, dispatch]);

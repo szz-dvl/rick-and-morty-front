@@ -1,10 +1,27 @@
-import { getData } from "../../common";
+import { getData, postData, deleteData } from "../../common";
 import { Character } from "../../types";
 
-export const fetchPage = async (page: number): Promise<Character[]> => {
+export const fetchPage = async (page: number): Promise<{characters: Character[], hasNext: boolean}> => {
 
     const { characters } = await getData(`/character/list?page=${page}`);
 
-    return characters.data.results;
+    return { characters: characters.data.results, hasNext: !!characters.data.info.next };
+}
+
+export const fetchFavorites = async (): Promise<{favorites: number[]}> => {
+
+    return await getData(`/user/favorites`);
+
+}
+
+export const favorite = async (id: number): Promise<{favorites: number[]}> => {
+
+    return await postData(`/user/favorite`, { id });
+
+}
+
+export const unfavorite = async (id: number): Promise<{favorites: number[]}> => {
+
+    return  await deleteData(`/user/favorite/${id}`);
 
 }

@@ -12,6 +12,7 @@ export default function Login() {
     const [nick, setNickName] = useState("");
     const [pwd, setPwd] = useState("");
     const [remember, setRemember] = useState(false);
+    const [errorTo, setErrorTo] = useState<NodeJS.Timeout | null>(null);
 
     const error = useAppSelector((state: RootState) => state.login.error);
     const in_progress = useAppSelector((state: RootState) => state.login.in_progress);
@@ -29,9 +30,15 @@ export default function Login() {
     useEffect(() => {
 
         if (error) {
-            setTimeout(() => {
-                dispatch(clean());
-            }, parseInt(process.env.REACT_APP_ERR_TO as string));
+
+            if (errorTo)
+                clearTimeout(errorTo);
+
+            setErrorTo(
+                setTimeout(() => {
+                    dispatch(clean());
+                }, parseInt(process.env.REACT_APP_ERR_TO as string))
+            );
         }
 
     }, [error, dispatch]);

@@ -8,7 +8,7 @@ export interface Character {
 
     id: number;
     name: string;
-    status: "Alive" | 'Dead' | 'unknown';
+    status: 'Alive' | 'Dead' | 'unknown';
     species: string;
     type: string;
     gender: 'Female' | 'Male' | 'Genderless' | 'unknown';
@@ -18,5 +18,4 @@ export interface Character {
     episode: string[];
     url: string;
     created: Date;
-    
 }

@@ -63,3 +63,10 @@ export function getData(url: string = ``) {
     return api(url, "GET");
 
 }
+
+export function deleteData(url: string = ``) {
+
+    return api(url, "DELETE");
+
+}
+

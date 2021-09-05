@@ -1,6 +1,6 @@
-.App {
+/* .App {
   text-align: center;
-}
+} */
 
 .App::before {
   content: "";
@@ -13,7 +13,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  filter: saturate(0.65) opacity(0.85);
+  filter: saturate(.65) opacity(.85);
   z-index: -20;
 }
 
