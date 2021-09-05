@@ -1,9 +1,8 @@
 import { postData } from "../../common";
 
-export const submitLogin = async (user: string, pwd: string) => {
+export const submitLogin = async (user: string, pwd: string, remember: boolean) => {
     
-  const response = await postData('/auth/login', { user, pwd, remember: false });
-  return response.token;
+  return user && pwd ? await postData('/auth/login', { user, pwd, remember }) : Promise.reject(new Error("Missing data."));
 
 }
   

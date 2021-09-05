@@ -1,58 +1,67 @@
-import React, { useState, useRef } from 'react';
-import { ReactComponent as ShowPassword } from '../../images/open_eye.svg';
-import { ReactComponent as HidePassword } from '../../images/closed_eye.svg';
-import { submit } from "./loginSlice";
+import React, { useState, FormEvent, useEffect } from 'react';
+import { clean, submit } from "./loginSlice";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { RootState } from '../../app/store';
+import Password from '../../components/PaswordField/PasswordField';
+import NickLabel from '../../components/NickLabel';
+import { useHistory } from 'react-router-dom';
 import './Login.css';
 
-function Login() {
+export default function Login() {
 
     const [nick, setNickName] = useState("");
     const [pwd, setPwd] = useState("");
-    const [pwdMode, setPwdMode] = useState("password");
-    const pwdRef = useRef<HTMLInputElement>(null);
+    const [remember, setRemember] = useState(false);
+
     const error = useAppSelector((state: RootState) => state.login.error);
     const in_progress = useAppSelector((state: RootState) => state.login.in_progress);
+
     const dispatch = useAppDispatch();
+    const history = useHistory();
 
-    const togglePwdMode = () => {
-        setPwdMode(pwdMode === "password" ? "text" : "password");
+    const submitForm = (ev: FormEvent) => {
+        ev.preventDefault();
 
-        if (pwdRef.current)
-            pwdRef.current.focus();
+        if (!in_progress)
+            dispatch(submit({ nick, pwd, remember, history }));
     }
+
+    useEffect(() => {
+
+        if (error) {
+            setTimeout(() => {
+                dispatch(clean());
+            }, parseInt(process.env.REACT_APP_ERR_TO as string));
+        }
+
+    }, [error, dispatch]);
 
     return (
         <div className="login-container">
-            <form className="login-form">
+            <form className="login-form" onSubmit={submitForm}>
 
                 <div className="login-field">
                     <label htmlFor="nick">
-                        <span> Nick Name: </span>
+                        <NickLabel />
                     </label>
                     <input name="nick" id="nick" type="text" value={nick} onChange={(ev) => setNickName(ev.target.value)} autoFocus />
                 </div>
 
-                <div className="login-field">
-                    <label htmlFor="pwd">
-                        <span> Password: </span>
-                    </label>
-                    <input name="pwd" id="pwd" type={pwdMode} value={pwd} onChange={(ev) => setPwd(ev.target.value)} ref={pwdRef} />
+                <Password set={setPwd} value={pwd} extraClass="login-field" />
 
-                    <span className="login-icon__pwd" onClick={() => togglePwdMode()}>
-                        {pwdMode === 'password' ? <ShowPassword /> : <HidePassword />}
-                    </span>
+                <div className="login-check">
+                    <label htmlFor="remember">
+                        <span> Remember me </span>
+                    </label>
+                    <input name="remember" id="remember" type="checkbox" onChange={(ev) => setRemember(ev.target.checked)} />
                 </div>
 
-                <input className="login-submit" type="button" value="Submit" onClick={() => dispatch(submit({ nick, pwd }))} disabled={in_progress} />
+                <input className="login-submit" type="submit" value="Submit" onClick={submitForm} disabled={in_progress} />
 
             </form>
 
-            <p className={`login-error ${error ? "visible" : "invisible"}`}> {error} </p>
-            
+            <p className={`login-error ${error ? "opaque" : "transparent"}`}> {error} </p>
+
         </div>
     );
 }
-
-export default Login;

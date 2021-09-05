@@ -1,4 +1,4 @@
-.login-container  {
+.register-container  {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -6,15 +6,15 @@
     height: 100vh;
 }
 
-.login-form {
+.register-form {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    height: 250px;
+    height: 360px;
     width: 280px;
 }
 
-.login-field {
+.register-field {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -24,44 +24,27 @@
     width: 100%;
 }
 
-.login-field label {
+.register-field label {
     font-size: large;
     font-weight: bold;
 }
 
-.login-field input {
+.register-field input {
     height: 35px;
     width: 100%;
     box-sizing: border-box;
     border-radius: 5px;
 }
 
-.login-submit {
+.register-submit {
     width: 100%;
     font-family: 'Courier Prime', monospace;
     font-size: large;
 }
 
-.login-error {
+.register-error {
     font-size: large;
     color: red;
     min-height: 30px;
     transition: opacity .8s ease;
-}
-
-.login-check {
-    display: flex;
-    align-self: flex-start;
-    flex-direction: row-reverse;
-    margin-bottom: 25px;
-}
-
-.login-check label {
-    font-size: medium;
-    font-weight: bold;
-}
-
-.login-check input {
-    margin-right: 15px;
-    transform: scale(1.4);
 }

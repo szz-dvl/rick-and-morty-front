@@ -1,0 +1,20 @@
+.character-card {
+    display: flex;
+    border: 1px solid black;
+}
+
+.character-card--image {
+    width: 40%;
+    position: relative;
+}
+
+.character-card--image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.character-card--info {
+    width: 60%;
+    text-align: center;
+}

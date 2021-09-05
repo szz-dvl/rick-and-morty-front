@@ -1,11 +1,15 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import login from '../containers/Login/loginSlice';
+import register from '../containers/Register/registerSlice';
+import list from '../containers/List/listSlice';
 import session from '../session/sessionSlice';
 
 export const store = configureStore({
   reducer: {
     login,
-    session
+    session,
+    register,
+    list
   },
 });
 

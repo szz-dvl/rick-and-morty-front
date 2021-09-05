@@ -1,46 +1,45 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { submitLogin } from './loginAPI';
-import SessionService from '../../session/SessionService';
+import { submitRegister } from './registerAPI';
 import { History } from 'history';
 
-export interface LoginState {
+export interface RegisterState {
     error: string | null;
     in_progress: boolean;
 }
 
-interface LoginData {
+interface RegisterData {
     nick: string;
     pwd: string;
-    remember: boolean;
+    check: string;
     history: History;
 }
 
-const initialState: LoginState = {
+const initialState: RegisterState = {
     error: null,
     in_progress: false,
 };
 
 export const submit = createAsyncThunk(
-    'LOGIN/SUBMIT',
-    async ({ nick, pwd, remember, history }: LoginData, thunkAPI) => {
+    'REGISTER/SUBMIT',
+    async ({ nick, pwd, check, history }: RegisterData, thunkAPI) => {
         try {
 
-            const { token } = await submitLogin(nick, pwd, remember);
+            const { state } = await submitRegister(nick, pwd, check);
 
-            SessionService.saveData(nick, token);
-
-            history.push("/list");
+            if (state)
+                history.push("/");
 
             return true;
             
         } catch (err) {
+
             return thunkAPI.rejectWithValue(err.message);
         }
     }
 );
 
-export const loginSlice = createSlice({
-    name: 'login',
+export const registerSlice = createSlice({
+    name: 'register',
     initialState,
     reducers: {
         clean: (state) => {
@@ -65,5 +64,5 @@ export const loginSlice = createSlice({
     },
 });
 
-export const { clean } = loginSlice.actions;
-export default loginSlice.reducer;
+export const { clean } = registerSlice.actions;
+export default registerSlice.reducer;

@@ -1,40 +1,65 @@
 import SessionService from "./session/SessionService";
-import fetch from "cross-fetch";
 
-export function postData(url: string = ``, data: object = {}, token?: string) {
+function api(url: string, method: string, data?: object) {
 
-    return fetch(process.env.REACT_APP_API_URL + url, {
-        method: 'POST',
-        mode: 'no-cors', /* Meterlo! */
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: token ?
-            {
-                'Content-Type': 'application/json; charset=utf-8',
-                Authorization: 'Rick_And_Morty ' + token
-            } :
-            {
-                'Content-Type': 'application/json; charset=utf-8'
-            },
-        redirect: 'follow',
-        referrer: 'no-referrer',
-        body: JSON.stringify(data)
-    }).then(response => {
-        try {
-            if (response.ok) return response.json();
-            else {
+    return new Promise<any>((resolve, reject) => {
 
-                if (response.status === 401)
-                    SessionService.removeData();
+        const token = SessionService.getToken();
 
-                return response.json().then(json => {
-                    throw new Error(json.err);
-                });
-            }
-        } catch (err) {
-            return response.text().then(text => {
-                throw new Error(text);
-            });
+        const headers: any = {
+            'Content-Type': 'application/json; charset=utf-8'
+        };
+
+        if (token)
+            headers.Authorization = 'Rick_And_Morty ' + token;
+
+        const options: any = {
+            method,
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers,
+            redirect: 'follow',
+            referrer: 'no-referrer',
         }
+
+        if (data)
+            options.body = JSON.stringify(data);
+
+        fetch(process.env.REACT_APP_API_URL + url, options)
+            .then(response => {
+
+                if (response.ok)
+                    return resolve(response.json());
+                else {
+
+                    if (response.status === 401)
+                        SessionService.removeData();
+
+                    return response.text().then(text => {
+                        try {
+
+                            let json = JSON.parse(text);
+                            reject(new Error(json.err));
+
+                        } catch (err) {
+                            reject(new Error(text));
+                        }
+                    });
+                }
+
+            }).catch(reject);
     });
+}
+
+export function postData(url: string = ``, data: object = {}) {
+
+    return api(url, "POST", data);
+
+}
+
+export function getData(url: string = ``) {
+
+    return api(url, "GET");
+
 }

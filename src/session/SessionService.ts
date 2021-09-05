@@ -40,4 +40,9 @@ export default class SessionService {
 
         SessionService.self.store.dispatch(deauthenticate());
     }
+
+    static getToken () {
+
+        return SessionService.self.store.getState().session.token;
+    }
 }

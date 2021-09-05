@@ -5,7 +5,8 @@
 .App::before {
   content: "";
   position: absolute;
-  top: 0; left: 0;
+  top: 0; 
+  left: 0;
   width: 100%; 
   height: 100%;
   background-image: url(./images/rick-morty.jpg);
@@ -28,12 +29,27 @@
 }
 
 .App-header {
-  min-height: 100vh;
+  min-height: 10vh;
+  width: 100%;
+  position: fixed;
   display: flex;
-  flex-direction: column;
+  flex-direction: row-reverse;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  justify-content: space-between;
+  /* font-size: calc(10px + 2vmin); */
+}
+
+.App-header--register, .App-header--logout {
+  margin-right: 25px;
+  cursor: pointer;
+  width: 50px;
+}
+
+.App-header--logged-user {
+  font-size: x-large;
+  font-weight: bold;
+  align-self: center;
+  margin-left: 25px;
 }
 
 .App-link {
@@ -58,4 +74,12 @@
 
 .invisible {
   visibility: hidden;
+}
+
+.opaque {
+  opacity: 1;
+}
+
+.transparent {
+  opacity: 0;
 }
