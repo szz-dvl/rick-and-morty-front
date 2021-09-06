@@ -8,8 +8,10 @@ import PrivateRoute from './components/PrivateRoute';
 import Register from './containers/Register/Register';
 import Login from './containers/Login/Login';
 import List from './containers/List/List';
+import Character from './containers/Character/Character';
 
 import './App.css';
+
 
 
 function App() {
@@ -22,7 +24,7 @@ function App() {
         <Route path="/" exact component={Login} />
         <Route path="/register" exact component={Register} />
         <PrivateRoute exact path="/list" component={List} authenticated={authenticated} />
-        <PrivateRoute exact path="/character/:id" component={Login} authenticated={authenticated} />
+        <PrivateRoute exact path="/character/:id" component={Character} authenticated={authenticated} />
       </Layout>
     </Router>
   );

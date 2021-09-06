@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useEffect, useRef } from 'react';
 import { clean, submit } from "./loginSlice";
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { RootState } from '../../app/store';
@@ -12,7 +12,6 @@ export default function Login() {
     const [nick, setNickName] = useState("");
     const [pwd, setPwd] = useState("");
     const [remember, setRemember] = useState(false);
-    const [errorTo, setErrorTo] = useState<NodeJS.Timeout | null>(null);
 
     const error = useAppSelector((state: RootState) => state.login.error);
     const in_progress = useAppSelector((state: RootState) => state.login.in_progress);
@@ -27,18 +26,18 @@ export default function Login() {
             dispatch(submit({ nick, pwd, remember, history }));
     }
 
+    const errorTo = useRef<NodeJS.Timeout | null>(null);
+
     useEffect(() => {
 
         if (error) {
 
-            if (errorTo)
-                clearTimeout(errorTo);
+            if (errorTo.current)
+                clearTimeout(errorTo.current);
 
-            setErrorTo(
-                setTimeout(() => {
-                    dispatch(clean());
-                }, parseInt(process.env.REACT_APP_ERR_TO as string))
-            );
+            errorTo.current = setTimeout(() => {
+                dispatch(clean());
+            }, parseInt(process.env.REACT_APP_ERR_TO as string));
         }
 
     }, [error, dispatch]);

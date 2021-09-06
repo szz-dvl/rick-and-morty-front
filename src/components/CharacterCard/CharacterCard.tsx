@@ -1,4 +1,4 @@
-import React, { forwardRef, MutableRefObject } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Character } from "../../types";
 import { ReactComponent as Star } from '../../images/star.svg';
@@ -23,10 +23,11 @@ interface CharacterCardProps {
     isFav: boolean;
     fav: (id: number) => void;
     unfav: (id: number) => void;
-    mode: CardModes
+    mode: CardModes,
+    style: any
 }
 
-const CharacterCard = ({ character, isFav, unfav, fav, mode }: CharacterCardProps) => {
+const CharacterCard = ({ character, isFav, unfav, fav, mode, style }: CharacterCardProps) => {
 
     const getImageSize = () => {
         if (mode <= CardModes.SM) 
@@ -38,12 +39,13 @@ const CharacterCard = ({ character, isFav, unfav, fav, mode }: CharacterCardProp
     }
 
     return (
-        <div className="character-card">
+        <div className="character-card" style={style}>
             <div className="character-card--links">
                 <div className="character-card--name">
                     <Link
                         to={{
                             pathname: "/character/" + character.id,
+                            state: { character_name: character.name }
                         }}
                     >
                         {character.name}
@@ -60,6 +62,7 @@ const CharacterCard = ({ character, isFav, unfav, fav, mode }: CharacterCardProp
                         <Link
                             to={{
                                 pathname: "/character/" + character.id,
+                                state: { character_name: character.name }
                             }}
                         >
                             <img src={character.image} width={getImageSize()} height={getImageSize()} alt="" />
@@ -91,6 +94,7 @@ const CharacterCard = ({ character, isFav, unfav, fav, mode }: CharacterCardProp
                         <Link
                             to={{
                                 pathname: "/character/" + character.id,
+                                state: { character_name: character.name }
                             }}
                         >
                             <img src={character.image} width="220" height="220" alt="" />

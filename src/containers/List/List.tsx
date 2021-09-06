@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector, usePrevious } from "../../app/hooks";
 import CharacterCard, { CardModes } from "../../components/CharacterCard/CharacterCard";
 import { ReactComponent as Grid } from '../../images/grid.svg';
-import { fetch, init, fav, unfav, unmount, PAGE_SIZE } from "./listSlice";
+import { fetch, init, fav, unfav, unmount } from "./listSlice";
 import "./List.css";
 
 enum Boundaries {
@@ -23,7 +23,7 @@ export default function List() {
     const [maxMode, setMaxMode] = useState(Modes.SM);
     const [cols, setCols] = useState(Modes.XL);
     const [scroll, setScroll] = useState(.5);
-
+    
     const index = useAppSelector((state) => state.list.index);
     const characters = useAppSelector((state) => state.list.characters);
     const favorites = useAppSelector((state) => state.list.favorites);
@@ -31,6 +31,8 @@ export default function List() {
     const fetching = useAppSelector((state) => state.list.fetching);
 
     const listRef = useRef<HTMLDivElement>(null);
+
+    const prevState = usePrevious<{ scroll: number, maxMode: Modes, fetching: number }>({ scroll, maxMode, fetching });
 
     const handleResize = useCallback(
         e => {
@@ -96,11 +98,14 @@ export default function List() {
 
 
     useEffect(() => {
-        if (initialised) {
+
+        if (prevState && prevState.maxMode !== maxMode) {
+
             if (cols > maxMode)
                 setCols(maxMode);
         }
-    }, [maxMode]);
+
+    }, [maxMode, cols, prevState]);
 
     useEffect(() => {
         if (initialised) {
@@ -114,50 +119,45 @@ export default function List() {
         window.addEventListener('resize', handleResize)
 
         return function cleanup() {
-            dispatch(unmount());
+            //dispatch(unmount());
             window.removeEventListener('resize', handleResize);
         }
-    }, [dispatch]);
+    }, [dispatch, handleResize]);
 
     useLayoutEffect(() => {
 
         if (listRef.current) {
             listRef.current.addEventListener("scroll", handleScroll, { passive: true });
+            const input = listRef.current;
 
             return function cleanup() {
 
-                if (listRef.current)
-                    listRef.current.removeEventListener("scroll", handleScroll);
+                if (input)
+                    input.removeEventListener("scroll", handleScroll);
             }
         }
 
-    }, [listRef.current]);
+    }, [handleScroll]);
 
     useEffect(() => {
 
-        if (!fetching && initialised) {
+        if (prevState && prevState.scroll !== scroll) {
 
-            if (scroll > 0.80) {
-                dispatch(fetch(index[index.length - 1] + 1));
-            } else if (scroll < 0.20 && index[0] > 1) {
-                dispatch(fetch(index[0] - 1));
-            }
+            if (!fetching) {
+
+                if (scroll > 0.80) {
+
+                    dispatch(fetch(index[index.length - 1] + 1));
+
+                } else if (index[0] > 1 && scroll < 0.15) {
+
+                    dispatch(fetch(index[0] - 1));
+
+                }
+            } 
         }
 
-    }, [scroll, dispatch]);
-
-    useEffect(() => {
-
-        if (!fetching && initialised) {
-
-            if (scroll > 0.95) {
-                dispatch(fetch(index[index.length - 1] + 1));
-            } else if (scroll < 0.05 && index[0] > 1) {
-                dispatch(fetch(index[0] - 1));
-            }
-        }
-
-    }, [fetching, dispatch]);
+    }, [scroll, fetching, prevState, index, dispatch]);
 
     return (
         <div className="list-container">
@@ -172,14 +172,14 @@ export default function List() {
                             <Grid />
                         </div>
                     </div>
-                </div>    
+                </div>
             }
             {
-                favorites &&
+                favorites && 
                 <div className="character-list" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }} ref={listRef}>
                     {
 
-                        characters.map(character => {
+                        characters.map((character, idx) => {
                             return (
                                 <CharacterCard
                                     character={character}
@@ -188,6 +188,7 @@ export default function List() {
                                     fav={(id) => dispatch(fav(id))}
                                     unfav={(id) => dispatch(unfav(id))}
                                     mode={getCardMode()}
+                                    style={{ scrollSnapAlign: idx && !(idx % cols) && scroll < 0.15 && index[0] !== 1 ? "center" : "none" }}
                                 />
                             );
                         })

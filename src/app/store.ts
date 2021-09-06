@@ -2,6 +2,7 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import login from '../containers/Login/loginSlice';
 import register from '../containers/Register/registerSlice';
 import list from '../containers/List/listSlice';
+import character from '../containers/Character/characterSlice';
 import session from '../session/sessionSlice';
 
 export const store = configureStore({
@@ -9,7 +10,8 @@ export const store = configureStore({
     login,
     session,
     register,
-    list
+    list,
+    character
   },
 });
 

@@ -3,7 +3,7 @@ import { fetchPage, fetchFavorites, favorite, unfavorite } from './listAPI';
 import { Character } from "../../types";
 import { RootState } from '../../app/store';
 
-export const PAGES_TO_KEEP = 4;
+export const PAGES_TO_KEEP = 3;
 export const PAGE_SIZE = 20;
 export interface ListState {
     characters: Character[];
@@ -150,7 +150,7 @@ export const listSlice = createSlice({
 
                 if (!state.hasNext) {
 
-                    /** Quick fix to avoid repeated elements when non complete pages */
+                    /** Quick fix to avoid repeated elements for not complete pages */
 
                     state.characters = state.characters.filter((character, idx, array) => {
                         return array.findIndex(c => c.id === character.id) === idx;
