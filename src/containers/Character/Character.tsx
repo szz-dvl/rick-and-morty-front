@@ -4,7 +4,6 @@ import { Link, Redirect, useLocation, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { clean, fetch, fav, unfav } from "./characterSlice";
 import { ReactComponent as Back } from '../../images/left_arrow.svg';
-import { Boundaries } from "../../types";
 import Episode from "../../components/Episode/Episode";
 import { ReactComponent as Star } from '../../images/star.svg';
 import { ReactComponent as Skull } from '../../images/skull.svg';
@@ -30,7 +29,7 @@ export default function Character() {
     const [data, setData] = useState<StringTuple[]>([])
 
     const { id } = useParams<{ id: string }>();
-    const { state } = useLocation<{ character_name: string }>();
+    const { state } = useLocation<{ character_name: string, page: number }>();
 
     useEffect(() => {
         dispatch(fetch(parseInt(id)));
@@ -39,15 +38,6 @@ export default function Character() {
             dispatch(clean());
         }
     }, [dispatch, id]);
-
-    const getImageSize = () => {
-        if (document.body.clientWidth <= Boundaries.M)
-            return 140;
-        else if (document.body.clientWidth > Boundaries.M && document.body.clientWidth <= Boundaries.L)
-            return 220
-        else
-            return 260;
-    }
 
     useEffect(() => {
 
@@ -74,14 +64,15 @@ export default function Character() {
     }, [character]);
 
     return (
-        <div className="character-container">
+        <div className="container character-container">
             <div className="character-header">
                 {!error &&
                     <div className="back-container">
                         <span>
                             <Link
                                 to={{
-                                    pathname: "/list"
+                                    pathname: "/list",
+                                    state: { page: state ? state.page || 1 : 1, id: character ? character.id : null }
                                 }}
                             >
                                 <Back />
@@ -112,15 +103,15 @@ export default function Character() {
                     <div className="character-data">
 
                         <div className="character-image">
-                            <img src={character.image} width={getImageSize()} height={getImageSize()} alt="" />
+                            <img src={character.image} alt="" />
                         </div>
 
                         <div className="character-fields">
                             {
-                                data.map((info) => {
+                                data.map((info, idx) => {
                                     return (
                                         info.data ?
-                                            <div className="character-field">
+                                            <div className="character-field" key={`field-${idx}`}>
                                                 <span className="field-title">
                                                     {info.title}:
                                                 </span>
@@ -133,7 +124,7 @@ export default function Character() {
                                 })
                             }
                         </div>
-
+                        
                         <div className="character-status">
                             <div className="character-field">
                                 <span className="field-title">
@@ -166,6 +157,7 @@ export default function Character() {
                             </div>
                         </div>
                     </div>
+                    <hr className="character-separator"/>
                     <div className="character-episodes">
                         <div className="character-field">
                             <span className="field-title">
@@ -176,9 +168,7 @@ export default function Character() {
                             {
                                 episodes.map((episode) => {
                                     return (
-                                        <div>
-                                            <Episode episode={episode} />
-                                        </div>
+                                        <Episode episode={episode} key={`episode-${episode.id}`} />
                                     );
                                 })
                             }
@@ -197,7 +187,7 @@ export default function Character() {
                 <Redirect
                     to={{
                         pathname: "/error",
-                        state: { error }
+                        state: { error: error.toString() }
                     }}
                 />
 

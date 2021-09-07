@@ -26,6 +26,7 @@ function App() {
           <PrivateRoute exact path="/list" component={List} authenticated={authenticated} />
           <PrivateRoute exact path="/character/:id" component={Character} authenticated={authenticated} />
           <Route path="/error" component={Error} />
+          <Route component={Error} />
         </Switch>
       </Layout>
     </Router>

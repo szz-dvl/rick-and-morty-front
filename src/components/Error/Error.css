@@ -1,13 +1,4 @@
 .error-container {
-    width: 90vw;
-    height: 90vh;
-    background-color: rgba(255, 255, 255, .85);
-    border-radius: 15px;
-    margin: 0 auto;
-    position: relative;
-    top: 8vh;
-    display: flex;
-    flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
 }

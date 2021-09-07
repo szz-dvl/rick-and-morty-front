@@ -3,6 +3,13 @@ import { fetchPage, fetchFavorites, favorite, unfavorite } from './listAPI';
 import { Character } from "../../types";
 import { RootState } from '../../app/store';
 
+export enum Modes {
+    SM = 1,
+    M,
+    L,
+    XL
+}
+
 export const PAGES_TO_KEEP = 3;
 export const PAGE_SIZE = 20;
 export interface ListState {
@@ -12,15 +19,17 @@ export interface ListState {
     initialised: boolean;
     fetching: number;
     hasNext: boolean;
+    cols: Modes
 }
 
 const initialState: ListState = {
     characters: [],
     favorites: [],
-    index: [1],
+    index: [],
     initialised: false,
     fetching: 0,
     hasNext: true,
+    cols: Modes.XL
 };
 
 export const fetch = createAsyncThunk(
@@ -49,24 +58,21 @@ export const fetch = createAsyncThunk(
     }
 );
 
-//https://github.com/reduxjs/redux-toolkit/issues/489
-export const _init = createAsyncThunk(
+export const init = createAsyncThunk(
     'LIST/INIT',
-    async (dummy: any, thunkAPI) => {
+    async (initPage: number, thunkAPI) => {
         try {
 
-            const { characters } = await fetchPage(1);
+            const { characters } = await fetchPage(initPage);
             const { favorites } = await fetchFavorites();
 
-            return { characters, favorites };
+            return { characters, favorites, page: initPage };
 
         } catch (err) {
             return thunkAPI.rejectWithValue(err.message);
         }
     }
 );
-
-export const init = (dummy: any = {}) => _init(dummy);
 
 export const fav = createAsyncThunk(
     'USER/FAVORITE',
@@ -103,7 +109,18 @@ export const listSlice = createSlice({
         unmount: (state) => {
             state.favorites = [];
             state.characters = [];
+            state.index = [];
             state.initialised = false;
+            state.fetching = 0;
+        },
+        setCols: (state, action) => {
+
+            const { cols, user } = action.payload;
+
+            if (user)
+                state.cols = cols;
+            else if (state.cols > cols)
+                state.cols = cols;
         }
     },
     extraReducers: (builder) => {
@@ -162,11 +179,12 @@ export const listSlice = createSlice({
 
                 //console.log(state.characters.map(c => c.id), state.index);
             })
-            .addCase(_init.fulfilled, (state, action) => {
-                const { characters, favorites } = action.payload;
+            .addCase(init.fulfilled, (state, action) => {
+                const { characters, favorites, page } = action.payload;
                 state.favorites = favorites;
                 state.characters = characters;
                 state.initialised = true;
+                state.index.push(page);
             })
             .addCase(fav.fulfilled, (state, action) => {
                 state.favorites = action.payload;
@@ -177,5 +195,5 @@ export const listSlice = createSlice({
     },
 });
 
-export const { unmount } = listSlice.actions;
+export const { unmount, setCols } = listSlice.actions;
 export default listSlice.reducer;

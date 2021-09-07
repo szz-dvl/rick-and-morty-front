@@ -44,7 +44,7 @@ export default function Register() {
     }, [error, dispatch]);
 
     return (
-        <div className="register-container">
+        <div className="form-container">
             <form className="register-form" onSubmit={submitForm}>
 
                 <div className="register-field">
@@ -58,14 +58,15 @@ export default function Register() {
 
                 <Password set={setPwdCheck} value={check} extraClass="register-field" disabled={!pwd} label="Password check" />
 
-                <input className="register-submit" type="submit" value="Submit" onClick={submitForm} disabled={in_progress} />
+                <input className="register-submit button" type="submit" value="Submit" onClick={submitForm} disabled={in_progress} />
 
                 <Link
+                    className="cancel-link"
                     to={{
                         pathname: "/",
                     }}
                 >
-                    <input className="register-submit" type="button" value="Cancel" disabled={in_progress} />
+                    <input className="register-submit button" type="button" value="Cancel" disabled={in_progress} />
                 </Link>
             </form>
 

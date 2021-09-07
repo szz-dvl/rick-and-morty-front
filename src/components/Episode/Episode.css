@@ -10,11 +10,16 @@
 }
 
 .episode-field .field-title {
-    font-weight: 500;
     padding-right: 5px;
 }
 
 .episode-container ul {
     margin: 0;
     padding-left: 30px;
+}
+
+@media(max-width: 765px) {
+    .episode-container ul {
+        padding-left: 25px;
+    }
 }

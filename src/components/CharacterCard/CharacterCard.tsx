@@ -1,4 +1,4 @@
-import React from "react";
+import React, { MutableRefObject } from "react";
 import { Link } from "react-router-dom";
 import { Character } from "../../types";
 import { ReactComponent as Star } from '../../images/star.svg';
@@ -9,6 +9,7 @@ import { ReactComponent as Genderless } from '../../images/circle.svg';
 import { ReactComponent as Female } from '../../images/female.svg';
 import { ReactComponent as Male } from '../../images/male.svg';
 import "./CharacterCard.css"
+import { forwardRef } from "react";
 
 export enum CardModes {
     T,
@@ -24,10 +25,11 @@ interface CharacterCardProps {
     fav: (id: number) => void;
     unfav: (id: number) => void;
     mode: CardModes,
-    style: any
+    style: any,
+    page: number
 }
 
-const CharacterCard = ({ character, isFav, unfav, fav, mode, style }: CharacterCardProps) => {
+const CharacterCard = forwardRef(({ character, isFav, unfav, fav, mode, style, page }: CharacterCardProps, ref) => {
 
     const getImageSize = () => {
         if (mode <= CardModes.SM) 
@@ -39,13 +41,13 @@ const CharacterCard = ({ character, isFav, unfav, fav, mode, style }: CharacterC
     }
 
     return (
-        <div className="character-card" style={style}>
+        <div className="character-card" style={style} ref={ref as MutableRefObject<HTMLDivElement>}>
             <div className="character-card--links">
                 <div className="character-card--name">
                     <Link
                         to={{
                             pathname: "/character/" + character.id,
-                            state: { character_name: character.name }
+                            state: { character_name: character.name, page }
                         }}
                     >
                         {character.name}
@@ -62,7 +64,7 @@ const CharacterCard = ({ character, isFav, unfav, fav, mode, style }: CharacterC
                         <Link
                             to={{
                                 pathname: "/character/" + character.id,
-                                state: { character_name: character.name }
+                                state: { character_name: character.name, page }
                             }}
                         >
                             <img src={character.image} width={getImageSize()} height={getImageSize()} alt="" />
@@ -94,7 +96,7 @@ const CharacterCard = ({ character, isFav, unfav, fav, mode, style }: CharacterC
                         <Link
                             to={{
                                 pathname: "/character/" + character.id,
-                                state: { character_name: character.name }
+                                state: { character_name: character.name, page }
                             }}
                         >
                             <img src={character.image} width="220" height="220" alt="" />
@@ -139,6 +141,6 @@ const CharacterCard = ({ character, isFav, unfav, fav, mode, style }: CharacterC
             </ul>
         </div>
     )
-};
+});
 
 export default CharacterCard;

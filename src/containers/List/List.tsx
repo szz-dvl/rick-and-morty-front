@@ -2,33 +2,27 @@ import React, { ChangeEvent, useCallback, useEffect, useLayoutEffect, useRef, us
 import { useAppDispatch, useAppSelector, usePrevious } from "../../app/hooks";
 import CharacterCard, { CardModes } from "../../components/CharacterCard/CharacterCard";
 import { ReactComponent as Grid } from '../../images/grid.svg';
-import { fetch, init, fav, unfav, unmount } from "./listSlice";
+import { fetch, init, fav, unfav, unmount, PAGE_SIZE, Modes, setCols } from "./listSlice";
 import { Boundaries } from "../../types";
+import { useLocation } from "react-router-dom";
+import { useInView } from "react-intersection-observer";
+
 import "./List.css";
-
-
-enum Modes {
-    SM = 1,
-    M,
-    L,
-    XL
-}
 
 export default function List() {
 
     const [maxMode, setMaxMode] = useState(Modes.SM);
-    const [cols, setCols] = useState(Modes.XL);
     const [scroll, setScroll] = useState(.5);
-    
-    const index = useAppSelector((state) => state.list.index);
-    const characters = useAppSelector((state) => state.list.characters);
-    const favorites = useAppSelector((state) => state.list.favorites);
-    const initialised = useAppSelector((state) => state.list.initialised);
-    const fetching = useAppSelector((state) => state.list.fetching);
+    const [ignore, setIgnore] = useState(0);
+
+    const { index, characters, favorites, initialised, fetching, cols } = useAppSelector((state) => state.list);
 
     const listRef = useRef<HTMLDivElement>(null);
+    const [listElement, listElemInview, listElemEnry] = useInView({ threshold: 1 });
 
-    const prevState = usePrevious<{ scroll: number, maxMode: Modes, fetching: number }>({ scroll, maxMode, fetching });
+    const prevState = usePrevious<{ scroll: number, maxMode: Modes }>({ scroll, maxMode });
+
+    const { state } = useLocation<{ page: number, id: number }>();
 
     const handleResize = useCallback(
         e => {
@@ -95,22 +89,37 @@ export default function List() {
 
     useEffect(() => {
 
-        if (prevState && prevState.maxMode !== maxMode) {
-
-            if (cols > maxMode)
-                setCols(maxMode);
-        }
-
-    }, [maxMode, cols, prevState]);
+        if (prevState && prevState.maxMode !== maxMode)
+            dispatch(setCols({ cols: maxMode, user: false }));
+        
+    }, [maxMode, prevState, dispatch]);
 
     useEffect(() => {
-        if (initialised) {
+        if (initialised)
             changeMaxMode(document.body.clientWidth);
-        }
+
     }, [initialised]);
 
     useEffect(() => {
-        dispatch(init());
+        if (listElemEnry && ignore === 0) {
+            setIgnore(1);
+            listElemEnry.target.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
+
+    }, [listElemEnry, ignore]);
+
+    useEffect(() => {
+
+        if (listElemInview) {
+            setTimeout(() => {
+                setIgnore(2);
+            }, 120);
+        }
+
+    }, [listElemInview]);
+
+    useEffect(() => {
+        dispatch(init(state ? state.page || 1 : 1));
 
         window.addEventListener('resize', handleResize)
 
@@ -118,7 +127,7 @@ export default function List() {
             dispatch(unmount());
             window.removeEventListener('resize', handleResize);
         }
-    }, [dispatch, handleResize]);
+    }, [dispatch, handleResize, state]);
 
     useLayoutEffect(() => {
 
@@ -139,39 +148,49 @@ export default function List() {
 
         if (prevState && prevState.scroll !== scroll) {
 
-            if (!fetching) {
+            if (!fetching && ignore !== 1) {
 
-                if (scroll > 0.80) {
+                if (scroll > 0.90) {
 
                     dispatch(fetch(index[index.length - 1] + 1));
 
-                } else if (index[0] > 1 && scroll < 0.15) {
+                } else if (index[0] > 1 && scroll < 0.10) {
 
                     dispatch(fetch(index[0] - 1));
 
                 }
-            } 
+            }
         }
 
-    }, [scroll, fetching, prevState, index, dispatch]);
+    }, [scroll, fetching, prevState, index, ignore, dispatch]);
 
     return (
-        <div className="list-container">
+        <div className="container">
             {
                 maxMode > Modes.SM &&
                 <div className="list-selector">
-                    {/* Really weird behavior here is using onChange ==> comment!*/ }
-                    <input type="range" min="1" max={maxMode} className="slider" value={cols} step="1" onInput={(ev: ChangeEvent<HTMLInputElement>) => setCols(parseInt(ev.target.value))} />
+                    
+                    <input 
+                        type="range" 
+                        min="1" 
+                        max={maxMode} 
+                        className="slider" 
+                        value={cols} 
+                        step="1" 
+                        onInput={(ev: ChangeEvent<HTMLInputElement>) => dispatch(setCols({cols: parseInt(ev.target.value), user: true }))} 
+                    />
+
                     <div className="list-sizes">
                         <div className="square" />
                         <div className="grid" >
                             <Grid />
                         </div>
                     </div>
+
                 </div>
             }
             {
-                favorites && 
+                favorites &&
                 <div className="character-list" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }} ref={listRef}>
                     {
 
@@ -184,7 +203,9 @@ export default function List() {
                                     fav={(id) => dispatch(fav(id))}
                                     unfav={(id) => dispatch(unfav(id))}
                                     mode={getCardMode()}
-                                    style={{ scrollSnapAlign: idx && !(idx % cols) && scroll < 0.15 && index[0] !== 1 ? "center" : "none" }}
+                                    style={{ scrollSnapAlign: idx && !(idx % cols) && scroll < 0.10 && index[0] !== 1 ? "center" : "none" }}
+                                    page={(index[0] + Math.floor(idx / PAGE_SIZE))}
+                                    ref={state && state.id && state.id === character.id ? listElement : null}
                                 />
                             );
                         })

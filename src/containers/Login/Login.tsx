@@ -43,7 +43,7 @@ export default function Login() {
     }, [error, dispatch]);
 
     return (
-        <div className="login-container">
+        <div className="form-container">
             <form className="login-form" onSubmit={submitForm}>
 
                 <div className="login-field">
@@ -62,7 +62,7 @@ export default function Login() {
                     <input name="remember" id="remember" type="checkbox" onChange={(ev) => setRemember(ev.target.checked)} />
                 </div>
 
-                <input className="login-submit" type="submit" value="Submit" onClick={submitForm} disabled={in_progress} />
+                <input className="login-submit button" type="submit" value="Submit" onClick={submitForm} disabled={in_progress} />
 
             </form>
 

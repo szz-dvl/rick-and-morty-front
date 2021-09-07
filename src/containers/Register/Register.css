@@ -48,3 +48,7 @@
     min-height: 30px;
     transition: opacity .8s ease;
 }
+
+.cancel-link {
+    text-decoration: none;
+}

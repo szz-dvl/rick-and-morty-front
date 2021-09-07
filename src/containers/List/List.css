@@ -1,14 +1,3 @@
-.list-container {
-  width: 90vw;
-  height: 90vh;
-  background-color: rgba(255, 255, 255, .85);
-  border-radius: 15px;
-  margin: 0 auto;
-  position: relative;
-  top: 8vh;
-  display: flex;
-  flex-direction: column;
-}
 
 .list-selector {
   width: 15%;
@@ -77,6 +66,6 @@
   overflow-y: auto;
   gap: 15px;
   padding: 0 25px;
-  scroll-snap-type: y proximity;
+  scroll-snap-type: block mandatory;
   scroll-behavior: smooth;
 }
