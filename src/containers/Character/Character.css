@@ -10,6 +10,12 @@
     flex-direction: column;
 }
 
+.character-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .character--in-progress {
     width: 100%;
     height: 100%;
@@ -20,10 +26,133 @@
 }
 
 .character-info {
-    width: 100%;
+    overflow-y: hidden;
+    display: flex;
+    padding: 0 25px 25px 25px;
+    flex-direction: column;
+}
+
+.character-info h1 {
+    font-size: 50px;
+    margin: 0;
+    height: max-content;
+}
+
+.back-container {
+    max-width: 25px;
+    max-height: 25px;
+    border-radius: 25px;
+    border: 1px solid black;
+    margin: 5px 0 0 25px;
+    padding: 5px;
+}
+
+.fav-container {
+    padding: 15px 35px 0 0;
+}
+
+.back-container:hover {
+    background-color: lightgray;
+}
+
+.character-data {
+    display: flex;
+    min-height: 40vh;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.character-data .character-image {
+    padding: 25px;
+    /* width: 40%; */
+}
+
+.character-data .character-image img {
+    border-radius: 15px;
+}
+
+.character-data .character-fields {
+    /* width: 60%; */
     height: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-evenly;
+}
+
+.character-field .field-title {
+    font-size: 20px;
+    font-weight: bold;
+    padding-right: 10px;
+}
+
+.character-field .field-data {
+    font-size: large;
+}
+
+.fav-container svg {
+    filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+    max-width: 50px;
+    cursor: pointer;
+}
+
+.fav-container .fav {
+    fill: yellow
+}
+
+.fav-container .no-fav {
+    fill: lightgray
+}
+
+.character-episodes {
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+}
+
+.character-episodes .character-field {
+    margin-bottom: 15px;
+}
+
+.character-episodes .episodes-list {
+    max-width: 100%;
+    margin-bottom: 25px;
+    display: grid;
+    gap: 15px;
+    overflow-y: auto;
+    height: 100%;
+    padding: 0 25px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.field-data .status--alive {
+    fill: green;
+    transform: scale(0.85);
+}
+
+.field-data .status--dead {
+    fill: red;
+}
+
+.field-data .status--unknown {
+    transform: scale(0.85);
+}
+
+.field-data .gender--genderless {
+    transform: scale(0.65);
+}
+
+.field-data svg {
+    max-width: 50px;
+}
+
+.character-status {
+    display: flex;
+    flex-direction: column;
+}
+
+.character-status .character-field {
+    display: flex;
     align-items: center;
-    font-size: x-large;
+    margin: 20px 0;
 }

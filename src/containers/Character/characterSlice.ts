@@ -1,37 +1,51 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchCharacter, favorite, unfavorite } from './characterAPI';
-import { Character } from '../../types';
+import { fetchCharacter, favorite, unfavorite, fetchEpisodes } from './characterAPI';
+import { Character, Episode } from '../../types';
 
 export interface CharacterState {
     error: string | null;
     in_progress: boolean;
     character: Character | null;
     isFav: boolean;
+    episodes: Episode[]
 }
 
 const initialState: CharacterState = {
     error: null,
     in_progress: false,
     character: null,
-    isFav: false
+    isFav: false,
+    episodes: []
 };
 
 export const fetch = createAsyncThunk(
-    'REGISTER/SUBMIT',
+    'CHARACTER/FETCH',
     async (id: number, thunkAPI) => {
         try {
 
-            return await fetchCharacter(id);
+            const { character, isFav, status } = await fetchCharacter(id);
+
+            if (status === 200) {
+                
+                const episodes = await fetchEpisodes(character.episode.map((url) => {
+                    return parseInt(url.split('/').pop() as string);
+                }));
+    
+                return { character, episodes, isFav };
+
+            } else {
+                return thunkAPI.rejectWithValue(status);
+            }
+            
             
         } catch (err) {
-
-            return thunkAPI.rejectWithValue(err.message);
+            return thunkAPI.rejectWithValue((err as Error).message);
         }
     }
 );
 
 export const fav = createAsyncThunk(
-    'USER/FAVORITE',
+    'USER/FAVORITE/SINGLE',
     async (id: number, thunkAPI) => {
         try {
 
@@ -39,13 +53,13 @@ export const fav = createAsyncThunk(
             return true;
 
         } catch (err) {
-            return thunkAPI.rejectWithValue(err.message);
+            return thunkAPI.rejectWithValue((err as Error).message);
         }
     }
 );
 
 export const unfav = createAsyncThunk(
-    'USER/UNFAVORITE',
+    'USER/UNFAVORITE/SINGLE',
     async (id: number, thunkAPI) => {
         try {
 
@@ -53,7 +67,7 @@ export const unfav = createAsyncThunk(
             return false;
 
         } catch (err) {
-            return thunkAPI.rejectWithValue(err.message);
+            return thunkAPI.rejectWithValue((err as Error).message);
         }
     }
 );
@@ -67,6 +81,7 @@ export const characterSlice = createSlice({
             state.character = null;
             state.isFav = false;
             state.in_progress = false;
+            state.episodes = [];
         }
     },
     extraReducers: (builder) => {
@@ -77,20 +92,23 @@ export const characterSlice = createSlice({
             })
             .addCase(fetch.fulfilled, (state, action) => {
 
-                const { character, isFav } = action.payload;
+                const { character, isFav, episodes } = action.payload;
 
                 state.in_progress = false;
                 state.character = character;
                 state.isFav = isFav;
+                state.episodes = episodes;
             })
             .addCase(fetch.rejected, (state, action) => {
                 let error = action.payload as string;
 
                 state.in_progress = false;
                 state.error = error;
-            }).addCase(fav.fulfilled, (state, action) => {
+            })
+            .addCase(fav.fulfilled, (state, action) => {
                 state.isFav = action.payload;
-            }).addCase(unfav.fulfilled, (state, action) => {
+            })
+            .addCase(unfav.fulfilled, (state, action) => {
                 state.isFav = action.payload;
             });
     },

@@ -19,3 +19,16 @@ export interface Character {
     url: string;
     created: Date;
 }
+
+export enum Boundaries {
+    M = 768,
+    L = 1024,
+    XL = 1920
+}
+
+export interface Episode {
+    id: number;
+    name: string;
+    air_date: string;
+    episode: string;
+}

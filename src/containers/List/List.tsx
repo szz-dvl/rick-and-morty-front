@@ -3,13 +3,9 @@ import { useAppDispatch, useAppSelector, usePrevious } from "../../app/hooks";
 import CharacterCard, { CardModes } from "../../components/CharacterCard/CharacterCard";
 import { ReactComponent as Grid } from '../../images/grid.svg';
 import { fetch, init, fav, unfav, unmount } from "./listSlice";
+import { Boundaries } from "../../types";
 import "./List.css";
 
-enum Boundaries {
-    M = 768,
-    L = 1024,
-    XL = 1920
-}
 
 enum Modes {
     SM = 1,
@@ -119,7 +115,7 @@ export default function List() {
         window.addEventListener('resize', handleResize)
 
         return function cleanup() {
-            //dispatch(unmount());
+            dispatch(unmount());
             window.removeEventListener('resize', handleResize);
         }
     }, [dispatch, handleResize]);
@@ -164,8 +160,8 @@ export default function List() {
             {
                 maxMode > Modes.SM &&
                 <div className="list-selector">
-                    {/* Really weird behavior here is using onChange ==> comment! */}
-                    <input type="range" min="1" max={maxMode.toString()} className="slider" value={cols} onInput={(ev: ChangeEvent<HTMLInputElement>) => setCols(parseInt(ev.target.value))} />
+                    {/* Really weird behavior here is using onChange ==> comment!*/ }
+                    <input type="range" min="1" max={maxMode} className="slider" value={cols} step="1" onInput={(ev: ChangeEvent<HTMLInputElement>) => setCols(parseInt(ev.target.value))} />
                     <div className="list-sizes">
                         <div className="square" />
                         <div className="grid" >

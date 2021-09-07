@@ -1,6 +1,6 @@
 import SessionService from "./session/SessionService";
 
-function api(url: string, method: string, data?: object) {
+function api(url: string, method: string, data?: object | null, userOptions?: object ) {
 
     return new Promise<any>((resolve, reject) => {
 
@@ -13,15 +13,18 @@ function api(url: string, method: string, data?: object) {
         if (token)
             headers.Authorization = 'Rick_And_Morty ' + token;
 
-        const options: any = {
+        let options: any = {
             method,
             mode: 'cors',
-            cache: 'no-cache',
+            cache: 'default',
             credentials: 'same-origin',
             headers,
             redirect: 'follow',
             referrer: 'no-referrer',
         }
+
+        if (userOptions)
+            options = { ...options, ...userOptions };
 
         if (data)
             options.body = JSON.stringify(data);
@@ -52,21 +55,21 @@ function api(url: string, method: string, data?: object) {
     });
 }
 
-export function postData(url: string = ``, data: object = {}) {
+export function postData(url: string = ``, data: object = {}, options?: object) {
 
-    return api(url, "POST", data);
-
-}
-
-export function getData(url: string = ``) {
-
-    return api(url, "GET");
+    return api(url, "POST", data, options);
 
 }
 
-export function deleteData(url: string = ``) {
+export function getData(url: string = ``, options?: object) {
 
-    return api(url, "DELETE");
+    return api(url, "GET", null, options);
+
+}
+
+export function deleteData(url: string = ``, options?: object) {
+
+    return api(url, "DELETE", null, options);
 
 }
 
