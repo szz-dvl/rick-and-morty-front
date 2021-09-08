@@ -1,3 +1,5 @@
+/** Inspired by: https://github.com/bernabe9/redux-react-session/blob/master/examples/react-router-v4-example/src/components/PrivateRoute.js */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';

@@ -1,3 +1,5 @@
+/** Inspired by:  https://www.npmjs.com/package/redux-react-session */
+
 import { AppStore } from "../app/store";
 import { authenticate, deauthenticate } from "./sessionSlice";
 
