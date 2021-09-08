@@ -10,6 +10,11 @@ export enum Modes {
     XL
 }
 
+export enum Direction {
+    UP = -1,
+    DOWN = 1
+}
+
 export const PAGES_TO_KEEP = 3;
 export const PAGE_SIZE = 20;
 export interface ListState {
@@ -18,8 +23,8 @@ export interface ListState {
     index: number[];
     initialised: boolean;
     fetching: number;
-    hasNext: boolean;
-    cols: Modes
+    cols: Modes;
+    maxPages: number;
 }
 
 const initialState: ListState = {
@@ -28,30 +33,31 @@ const initialState: ListState = {
     index: [],
     initialised: false,
     fetching: 0,
-    hasNext: true,
-    cols: Modes.XL
+    cols: Modes.XL,
+    maxPages: 0
 };
 
 export const fetch = createAsyncThunk(
     'LIST/FETCH',
-    async (page: number, thunkAPI) => {
+    async (direction: Direction, thunkAPI) => {
         try {
 
             const state = thunkAPI.getState() as RootState;
+            const page = direction < 0 ? state.list.index[0] - 1 : direction > 0 ? state.list.index[state.list.index.length - 1] + 1 : -1;
 
-            if (!state.list.index.includes(page)) {
+            if (page >= 0) {
 
-                const direction = page > state.list.index[state.list.index.length - 1];
+                const target = page < 1 ? state.list.maxPages : page > state.list.maxPages ? 1 : page;
 
-                if ((page >= 1 && !direction) || (state.list.hasNext && direction)) {
+                if (!state.list.index.includes(page)) {
 
-                    const { characters, hasNext } = await fetchPage(page);
-                    return { characters, page, hasNext };
+                    const { characters } = await fetchPage(target);
+                    return { characters, page: target, direction };
 
-                } else return thunkAPI.rejectWithValue("Bad page");    
+                } else return thunkAPI.rejectWithValue("Already in view");
 
-            } else return thunkAPI.rejectWithValue("Fetching");
-            
+            } else return thunkAPI.rejectWithValue("Bad direction");
+
         } catch (err) {
             return thunkAPI.rejectWithValue(err.message);
         }
@@ -63,10 +69,10 @@ export const init = createAsyncThunk(
     async (initPage: number, thunkAPI) => {
         try {
 
-            const { characters } = await fetchPage(initPage);
+            const { characters, maxPages } = await fetchPage(initPage);
             const { favorites } = await fetchFavorites();
 
-            return { characters, favorites, page: initPage };
+            return { characters, favorites, page: initPage, maxPages };
 
         } catch (err) {
             return thunkAPI.rejectWithValue(err.message);
@@ -111,6 +117,7 @@ export const listSlice = createSlice({
             state.characters = [];
             state.index = [];
             state.initialised = false;
+            state.maxPages = 0;
             state.fetching = 0;
         },
         setCols: (state, action) => {
@@ -133,10 +140,9 @@ export const listSlice = createSlice({
                 state.fetching = 0;
             })
             .addCase(fetch.fulfilled, (state, action) => {
-                const { characters, page, hasNext } = action.payload;
-                const direction = page > state.index[state.index.length - 1];
+                const { characters, page, direction } = action.payload;
 
-                if (direction) {
+                if (direction > 0) {
 
                     /** Scrolling down */
 
@@ -165,7 +171,7 @@ export const listSlice = createSlice({
                     state.index = [page, ...state.index];
                 }
 
-                if (!state.hasNext) {
+                if (page === state.maxPages) {
 
                     /** Quick fix to avoid repeated elements for not complete pages */
 
@@ -175,15 +181,14 @@ export const listSlice = createSlice({
                 }
 
                 state.fetching = 0;
-                state.hasNext = hasNext;
-
-                //console.log(state.characters.map(c => c.id), state.index);
+                console.log(state.characters.map(c => c.id), state.index);
             })
             .addCase(init.fulfilled, (state, action) => {
-                const { characters, favorites, page } = action.payload;
+                const { characters, favorites, page, maxPages } = action.payload;
                 state.favorites = favorites;
                 state.characters = characters;
                 state.initialised = true;
+                state.maxPages = maxPages;
                 state.index.push(page);
             })
             .addCase(fav.fulfilled, (state, action) => {

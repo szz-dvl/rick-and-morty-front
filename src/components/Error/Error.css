@@ -1,6 +1,7 @@
 .error-container {
     justify-content: space-evenly;
     align-items: center;
+    overflow: hidden;
 }
 
 .error-description {
@@ -16,4 +17,5 @@
 .error-description--text {
     font-size: 20px;
     font-weight: normal;
+    text-align: center;
 }

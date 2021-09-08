@@ -2,7 +2,7 @@ import React, { ChangeEvent, useCallback, useEffect, useLayoutEffect, useRef, us
 import { useAppDispatch, useAppSelector, usePrevious } from "../../app/hooks";
 import CharacterCard, { CardModes } from "../../components/CharacterCard/CharacterCard";
 import { ReactComponent as Grid } from '../../images/grid.svg';
-import { fetch, init, fav, unfav, unmount, PAGE_SIZE, Modes, setCols } from "./listSlice";
+import { fetch, init, fav, unfav, unmount, PAGE_SIZE, Modes, setCols, Direction } from "./listSlice";
 import { Boundaries } from "../../types";
 import { useLocation } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
@@ -152,11 +152,11 @@ export default function List() {
 
                 if (scroll > 0.90) {
 
-                    dispatch(fetch(index[index.length - 1] + 1));
+                    dispatch(fetch(Direction.DOWN));
 
-                } else if (index[0] > 1 && scroll < 0.10) {
+                } else if (scroll < 0.25) {
 
-                    dispatch(fetch(index[0] - 1));
+                    dispatch(fetch(Direction.UP));
 
                 }
             }
@@ -204,7 +204,7 @@ export default function List() {
                                     unfav={(id) => dispatch(unfav(id))}
                                     mode={getCardMode()}
                                     style={{ scrollSnapAlign: idx && !(idx % cols) && scroll < 0.10 && index[0] !== 1 ? "center" : "none" }}
-                                    page={(index[0] + Math.floor(idx / PAGE_SIZE))}
+                                    page={(index[Math.floor(idx / PAGE_SIZE)])}
                                     ref={state && state.id && state.id === character.id ? listElement : null}
                                 />
                             );
