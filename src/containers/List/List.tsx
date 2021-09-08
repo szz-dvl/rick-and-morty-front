@@ -91,7 +91,7 @@ export default function List() {
 
         if (prevState && prevState.maxMode !== maxMode)
             dispatch(setCols({ cols: maxMode, user: false }));
-        
+
     }, [maxMode, prevState, dispatch]);
 
     useEffect(() => {
@@ -101,11 +101,13 @@ export default function List() {
     }, [initialised]);
 
     useEffect(() => {
-        if (listElemEnry && ignore === 0) {
-            setIgnore(1);
-            listElemEnry.target.scrollIntoView({ block: "center", behavior: "smooth" });
+        if (listElemEnry) {
+            if (ignore === 0) {
+                setIgnore(1);
+            } else if (ignore === 1) {
+                listElemEnry.target.scrollIntoView({ block: "end", behavior: "smooth" });
+            }
         }
-
     }, [listElemEnry, ignore]);
 
     useEffect(() => {
@@ -113,7 +115,7 @@ export default function List() {
         if (listElemInview) {
             setTimeout(() => {
                 setIgnore(2);
-            }, 120);
+            }, 150);
         }
 
     }, [listElemInview]);
@@ -154,7 +156,7 @@ export default function List() {
 
                     dispatch(fetch(Direction.DOWN));
 
-                } else if (scroll < 0.25) {
+                } else if (scroll < 0.20) {
 
                     dispatch(fetch(Direction.UP));
 
@@ -169,15 +171,15 @@ export default function List() {
             {
                 maxMode > Modes.SM &&
                 <div className="list-selector">
-                    
-                    <input 
-                        type="range" 
-                        min="1" 
-                        max={maxMode} 
-                        className="slider" 
-                        value={cols} 
-                        step="1" 
-                        onInput={(ev: ChangeEvent<HTMLInputElement>) => dispatch(setCols({cols: parseInt(ev.target.value), user: true }))} 
+
+                    <input
+                        type="range"
+                        min="1"
+                        max={maxMode}
+                        className="slider"
+                        value={cols}
+                        step="1"
+                        onInput={(ev: ChangeEvent<HTMLInputElement>) => dispatch(setCols({ cols: parseInt(ev.target.value), user: true }))}
                     />
 
                     <div className="list-sizes">
@@ -196,17 +198,18 @@ export default function List() {
 
                         characters.map((character, idx) => {
                             return (
-                                <CharacterCard
-                                    character={character}
-                                    key={`character-${character.id}`}
-                                    isFav={favorites.includes(character.id)}
-                                    fav={(id) => dispatch(fav(id))}
-                                    unfav={(id) => dispatch(unfav(id))}
-                                    mode={getCardMode()}
-                                    style={{ scrollSnapAlign: idx && !(idx % cols) && scroll < 0.10 && index[0] !== 1 ? "center" : "none" }}
-                                    page={(index[Math.floor(idx / PAGE_SIZE)])}
-                                    ref={state && state.id && state.id === character.id ? listElement : null}
-                                />
+                                character ?
+                                    <CharacterCard
+                                        character={character}
+                                        key={`character-${character.id}`}
+                                        isFav={favorites.includes(character.id)}
+                                        fav={(id) => dispatch(fav(id))}
+                                        unfav={(id) => dispatch(unfav(id))}
+                                        mode={getCardMode()}
+                                        style={{ scrollSnapAlign: idx && !(idx % cols) && scroll < 0.10 && index[0] !== 1 ? "center" : "none" }}
+                                        page={(index[Math.floor(idx / PAGE_SIZE)])}
+                                        ref={state && state.id && state.id === character.id ? listElement : null}
+                                    /> : null
                             );
                         })
                     }

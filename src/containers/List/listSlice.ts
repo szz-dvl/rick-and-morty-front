@@ -18,7 +18,7 @@ export enum Direction {
 export const PAGES_TO_KEEP = 3;
 export const PAGE_SIZE = 20;
 export interface ListState {
-    characters: Character[];
+    characters: (Character|null)[];
     favorites: number[];
     index: number[];
     initialised: boolean;
@@ -142,6 +142,10 @@ export const listSlice = createSlice({
             .addCase(fetch.fulfilled, (state, action) => {
                 const { characters, page, direction } = action.payload;
 
+                /** Quick fix to avoid repeated elements for not complete pages */
+                if (characters.length !== PAGE_SIZE)
+                    (characters as (Character|null)[]).push.apply(characters, Array.from({ length: PAGE_SIZE - characters.length }, (v, i) => null));
+
                 if (direction > 0) {
 
                     /** Scrolling down */
@@ -171,17 +175,8 @@ export const listSlice = createSlice({
                     state.index = [page, ...state.index];
                 }
 
-                if (page === state.maxPages) {
-
-                    /** Quick fix to avoid repeated elements for not complete pages */
-
-                    state.characters = state.characters.filter((character, idx, array) => {
-                        return array.findIndex(c => c.id === character.id) === idx;
-                    })
-                }
-
                 state.fetching = 0;
-                console.log(state.characters.map(c => c.id), state.index);
+                console.log(state.characters.map(c => c ? c.id : ""), state.index);
             })
             .addCase(init.fulfilled, (state, action) => {
                 const { characters, favorites, page, maxPages } = action.payload;
